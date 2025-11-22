@@ -14,7 +14,7 @@ def predict(ticker):
     pass
 
 @application.route('/', methods=['GET', 'POST'])
-def render_home_page():
+def render_home_page_and_results():
     list_of_tickers = ['AAPL', 'GOOG', 'TSLA', 'AMZN', 'META']
     selected_ticker = request.form.get('selected_ticker')
     if request.method == 'POST':
