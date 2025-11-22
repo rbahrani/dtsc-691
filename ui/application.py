@@ -7,6 +7,7 @@ import json
 import matplotlib.pyplot as plt
 import pickle
 from datetime import datetime
+from scrapper import fetch_recent_news_for_ticker
 
 application = Flask(__name__)
 
@@ -40,7 +41,8 @@ def render_home_page_and_results():
         plot_url = f"data:image/png;base64,{img_base64}"
 
         html_table = data.to_html(classes='stock-table', border=1, justify='left')
-        return render_template("results.html", selected_ticker=selected_ticker, html_table=html_table, plot_url=plot_url)
+        articles = fetch_recent_news_for_ticker(selected_ticker)
+        return render_template("results.html", selected_ticker=selected_ticker, html_table=html_table, plot_url=plot_url, articles=articles)
     return render_template("homepage.html", list_of_tickers=list_of_tickers)
 
 # @application.route('/resume', methods=['GET'])

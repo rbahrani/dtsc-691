@@ -16,6 +16,27 @@
     <div class="plot-container">
         <img src="{{ plot_url }}" alt="Price chart for {{ selected_ticker }}">
     </div>
+    <div>
+     {% if articles %}
+            {% for a in articles %}
+                <div class="article">
+                    <a href="{{ a.link }}" target="_blank">
+                        {{ a.title }}
+                    </a>
+
+                    {% if a.source %}
+                        <div><small>Source: {{ a.source }}</small></div>
+                    {% endif %}
+
+                    {% if a.published %}
+                        <div><small>Published: {{ a.published }}</small></div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No recent news found.</p>
+        {% endif %}
+    </div>
 {#    <h1>Select a ticker</h1>#}
 {#    <form method="POST">#}
 {#        <label for="selected_ticker">Choose a ticker for prediction:</label>#}
