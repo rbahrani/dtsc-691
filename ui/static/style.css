@@ -8,7 +8,7 @@ body {
 nav {
   position: fixed;
   z-index: 9999;
-  top: 0;
+  top: 20;
   left: 0;
   width: 100%;
   height: 35px;
@@ -51,7 +51,7 @@ nav a:hover {
   width: 100%;
   height: 100%;
   z-index: -1;
-  background: rgb(50, 50, 150);
+  background: black;
   transition: .45s ease-in-out;
 }
 
@@ -67,17 +67,23 @@ nav a:hover {
 
 h1 {
   text-align: center;
+  font: 30px/1.5 Helvetica, Verdana, sans-serif;
   font-family: Ubuntu;
-  letter-spacing: 1px;
+    top: 30%;
+  letter-spacing: 10px;
+  color: whitesmoke;
+  text-shadow: 20px 20px 40px black;
+  font-weight: bold;
 }
 
-.hero {
+.page {
   position: relative;
   width: 100%;
-  height: 500px;
+  height: 400px;
+  top: 10%;
   background: rgb(50, 50, 50);
-  background: url(https://doninmass.files.wordpress.com/2013/04/walking-in-rain-painting-wallpaper-hd.jpg) no-repeat 50% 50% fixed;
-  background-size: 130%;
+  background: url(/static/images/unsplash-image.jpg) no-repeat 100% 100% fixed;
+  background-size: 90%;
   overflow: hidden;
 }
 
@@ -91,17 +97,34 @@ h1 {
   font-weight: lighter;
 }
 
+.results-for-query {
+  position: relative;
+  top: 10%;
+  width: 100%;
+  padding: 0.4em;
+  font-size: 3em;
+  font-weight: lighter;
+}
+
 .content-wrapper {
+    position: relative;
   width: 80%;
   height: 3000px;
   padding: 1em 10%;
 }
 
 .content-wrapper h1 {
+    position: relative;
+    top: 5%;
   margin: 0;
   color: rgb(220, 120, 0);
 }
-
+.plot-container{
+    top: 5%;
+    left: -100;
+    right: 20px;
+    position: relative;
+}
 .content-wrapper p {
   font-family: "Open Sans";
   text-indent: 1.5em;
