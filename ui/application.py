@@ -7,32 +7,29 @@ application = Flask(__name__)
 def predict(ticker):
     pass
 
-@application.route('/Home Page', methods=['GET'])
+@application.route('/', methods=['GET', 'POST'])
 def render_home_page():
-    return render_template("homepage.html")
-
-@application.route('/Resume', methods=['GET'])
-def render_resume():
-    return render_template("resume.html")
-
-@application.route('/Other Projects', methods=['GET'])
-def render_other_projects():
-    return render_template("other_projects.html")
-
-@application.route('/DTSC-691 Project', methods=['GET', 'POST'])
-def render_DTSC_691_project():
-    list_of_tickers = ['General_SP500', 'AAPL', 'GOOG', 'TSLA', 'AMZN', 'META']
+    list_of_tickers = ['AAPL', 'GOOG', 'TSLA', 'AMZN', 'META']
     selected_ticker = request.form.get('ticker')
-    date_str = request.form.get('date')
-    # date = datetime.strptime(date_str, '%Y-%m-%d').date()
+    if request.method == 'POST':
+        print(selected_ticker)
+        return render_template("results.html")
+    return render_template("homepage.html", list_of_tickers=list_of_tickers)
 
-    # process the data for the selected ticker
-    predict(selected_ticker)
+# @application.route('/resume', methods=['GET'])
+# def render_resume():
+#     return render_template("resume.html")
+#
+# @application.route('/other_projects', methods=['GET'])
+# def render_other_projects():
+#     return render_template("other_projects.html")
 
-    return render_template("index.html", list_of_tickers=list_of_tickers, selected_ticker=selected_ticker)
-
-
-
+# @application.route('/DTSC_691_project', methods=['GET', 'POST'])
+# def render_DTSC_691_project():
+#     list_of_tickers = ['General_SP500', 'AAPL', 'GOOG', 'TSLA', 'AMZN', 'META']
+#     selected_ticker = request.form.get('ticker')
+#
+#     return render_template("index.html", list_of_tickers=list_of_tickers, selected_ticker=selected_ticker)
 
 
 if __name__ == "__main__":

@@ -1,12 +1,21 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Flask Dropdown</title>
-</head>
-<body>
+<nav>
+  <div class="nav-bg"></div>
+  <ul>
+    <li><a href="\">Home Page</a></li>
+    <li><a href="\resume">Resume</a></li>
+    <li><a href="\other_projects">Portfolio</a></li>
+    <li><a href="\DTSC_691_project">Project</a></li>
+  </ul>
+</nav>
+<div class="hero">
+  <h1>Add proper header title here</h1>
+</div>
+<div class="content-wrapper">
+  <h1>Some Title</h1>
+    <body>
     <h1>Select a ticker</h1>
     <form method="POST">
-        <label for="selected_ticker">Choose a ticker:</label>
+        <label for="selected_ticker">Choose a ticker for prediction:</label>
         <select name="selected_ticker" id="selected_ticker">
             {% for ticker in list_of_tickers %}
                 <option value="{{ ticker }}" {% if ticker == selected_ticker %}selected{% endif %}>{{ ticker }}</option>
@@ -20,4 +29,4 @@
         <p>You selected: {{ selected_ticker }}</p>
     {% endif %}
 </body>
-</html>
+</div>
