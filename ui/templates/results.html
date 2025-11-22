@@ -11,8 +11,10 @@
   <h1>Here are the results of your query for {{ selected_ticker }}:</h1>
 </div>
 <div class="content-wrapper">
-  <h1>Some Title</h1>
-    <body>
+  <h1> Price Chart </h1>
+    <div class="plot-container">
+        <img src="{{ plot_url }}" alt="Price chart for {{ selected_ticker }}">
+    </div>
 {#    <h1>Select a ticker</h1>#}
 {#    <form method="POST">#}
 {#        <label for="selected_ticker">Choose a ticker for prediction:</label>#}
@@ -28,5 +30,4 @@
 {#    {% if selected_ticker %}#}
 {#        <p>You selected: {{ selected_ticker }}</p>#}
 {#    {% endif %}#}
-    </body>
 </div>
