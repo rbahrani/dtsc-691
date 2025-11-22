@@ -11,22 +11,15 @@
 <div class="page">
 </div>
 <div class="content-wrapper">
-  <h1>Some Title</h1>
-    <body>
     <h1>Select a ticker</h1>
-    <form method="POST">
-        <label for="selected_ticker">Choose a ticker for prediction:</label>
-        <select name="selected_ticker" id="selected_ticker">
-            {% for ticker in list_of_tickers %}
-                <option value="{{ ticker }}" {% if ticker == selected_ticker %}selected{% endif %}>{{ ticker }}</option>
-            {% endfor %}
-        </select>
-        <br><br>
-        <input type="submit" value="Submit">
-    </form>
-
-    {% if selected_ticker %}
-        <p>You selected: {{ selected_ticker }}</p>
-    {% endif %}
-</body>
+        <form method="POST">
+            <label for="selected_ticker">Choose a ticker for prediction:</label>
+                <select name="selected_ticker" id="selected_ticker">
+                    {% for ticker in list_of_tickers %}
+                        <option value="{{ ticker }}" {% if ticker == selected_ticker %}selected{% endif %}>{{ ticker }}</option>
+                    {% endfor %}
+                </select>
+            <br><br>
+            <input type="submit" value="Submit">
+        </form>
 </div>
