@@ -1,0 +1,55 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<nav>
+  <div class="nav-bg"></div>
+  <ul>
+    <li><a href="\">Home Page</a></li>
+    <li><a href="\resume">Resume</a></li>
+    <li><a href="\other_projects">Portfolio</a></li>
+    <li><a href="\DTSC_691_project">Project</a></li>
+  </ul>
+</nav>
+<div class="results-for-query">
+  <h1>Here are the results of your query for {{ selected_ticker }}:</h1>
+</div>
+<div class="content-wrapper">
+  <h1> Price Chart </h1>
+    <div class="plot-container">
+        <img src="{{ plot_url }}" alt="Price chart for {{ selected_ticker }}">
+    </div>
+    <div>
+     {% if articles %}
+            {% for a in articles %}
+                <div class="article">
+                    <a href="{{ a.link }}" target="_blank">
+                        {{ a.title }}
+                    </a>
+
+                    {% if a.source %}
+                        <div><small>Source: {{ a.source }}</small></div>
+                    {% endif %}
+
+                    {% if a.published %}
+                        <div><small>Published: {{ a.published }}</small></div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No recent news found.</p>
+        {% endif %}
+    </div>
+{#    <h1>Select a ticker</h1>#}
+{#    <form method="POST">#}
+{#        <label for="selected_ticker">Choose a ticker for prediction:</label>#}
+{#        <select name="selected_ticker" id="selected_ticker">#}
+{#            {% for ticker in list_of_tickers %}#}
+{#                <option value="{{ ticker }}" {% if ticker == selected_ticker %}selected{% endif %}>{{ ticker }}</option>#}
+{#            {% endfor %}#}
+{#        </select>#}
+{#        <br><br>#}
+{#        <input type="submit" value="Submit">#}
+{#    </form>#}
+{##}
+{#    {% if selected_ticker %}#}
+{#        <p>You selected: {{ selected_ticker }}</p>#}
+{#    {% endif %}#}
+</div>

@@ -3,16 +3,19 @@
 
 <html>
 <head>
-    <title>Flask Dropdown</title>
+    <title>DTSC-691 Project</title>
 </head>
+<body>
+Welcome to the DTSC-691 project for this semester.
+</body>
 <body>
     <h1>Select a ticker</h1>
     <form method="POST">
-        <label for="selected_ticker">Choose a ticker for prediction:</label>
+        <label for="selected_ticker">Choose a ticker:</label>
         <select name="selected_ticker" id="selected_ticker">
-{#            {% for ticker in list_of_tickers %}#}
-{#                <option value="{{ ticker }}" {% if ticker == selected_ticker %}selected{% endif %}>{{ ticker }}</option>#}
-{#            {% endfor %}#}
+            {% for ticker in list_of_tickers %}
+                <option value="{{ ticker }}" {% if ticker == selected_ticker %}selected{% endif %}>{{ ticker }}</option>
+            {% endfor %}
         </select>
         <br><br>
         <input type="submit" value="Submit">
