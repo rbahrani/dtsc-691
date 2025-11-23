@@ -92,6 +92,7 @@ def augment_stocks_open_close_prices(data):
     merged = df.merge(stacked, on=[ticker_col, date_col], how="left")
     return merged
 
+
 def calculate_daily_returns(data):
     return data.assign(daily_return=lambda df: df["close"] / df["open"] - 1)
 
