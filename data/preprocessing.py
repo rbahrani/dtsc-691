@@ -34,15 +34,18 @@ def augment_stocks_open_close_prices(data):
     df = data.copy()
     df[date_col] = pd.to_datetime(df[date_col], errors="coerce").dt.normalize()
 
+    print("hello1")
     unique_tickers = df[ticker_col].dropna().unique().tolist()
     if len(unique_tickers) == 0 or df[date_col].isna().all():
         return df.assign(open_price=None, close_price=None)
 
     min_date = df[date_col].min()
     max_date = df[date_col].max()
+    print("hello2")
 
     # Try to download; on any exception, just return df with None prices
     try:
+        print("hello3")
         price_data = yf.download(
             unique_tickers,
             start=min_date,
@@ -57,47 +60,80 @@ def augment_stocks_open_close_prices(data):
         return df
 
     if price_data is None or price_data.empty:
+        print("hello4")
         df["open_price"] = None
         df["close_price"] = None
         return df
 
-    # Reshape depending on whether we have multiple tickers (MultiIndex) or single
+    # --- NEW: only keep Open & Close to simplify ---
     if isinstance(price_data.columns, pd.MultiIndex):
-        stacked = price_data.stack(level=1).reset_index()
+        print("hello5 (multi-index)")
+        # price_data columns look like: (ticker, field) or (field, ticker)
+        # We only care about Open / Close
+        try:
+            price_oc = price_data.loc[:, (slice(None), ["Open", "Close"])]
+        except KeyError:
+            # yfinance sometimes flips level order; swap if needed
+            price_data = price_data.swaplevel(0, 1, axis=1)
+            price_oc = price_data.loc[:, (slice(None), ["Open", "Close"])]
+
+        # After this, index is Date, columns MultiIndex -> stack tickers
+        stacked = price_oc.stack(level=0).reset_index()
+
+        # First two columns are date + ticker, regardless of their auto names
+        date_raw_col = stacked.columns[0]
+        ticker_raw_col = stacked.columns[1]
+
         stacked.rename(
             columns={
-                "level_1": ticker_col,
+                date_raw_col: date_col,
+                ticker_raw_col: ticker_col,
                 "Open": "open_price",
                 "Close": "close_price",
-                "Date": date_col,
             },
             inplace=True,
         )
+
     else:
+        print("hello5 (single ticker)")
+        # Single ticker -> regular columns: Date, Open, High, Low, Close, ...
         stacked = price_data.reset_index()
+
         only_ticker = unique_tickers[0] if len(unique_tickers) > 0 else None
         stacked[ticker_col] = only_ticker
+
+        # First column is the date index
+        date_raw_col = stacked.columns[0]
+
         stacked.rename(
             columns={
+                date_raw_col: date_col,
                 "Open": "open_price",
                 "Close": "close_price",
-                "Date": date_col,
             },
             inplace=True,
         )
 
+    # Normalize date & keep only the columns we want
     stacked[date_col] = pd.to_datetime(stacked[date_col]).dt.normalize()
-    stacked = stacked[[ticker_col, date_col, "open_price", "close_price"]]
+
+    keep_cols = [ticker_col, date_col, "open_price", "close_price"]
+    stacked = stacked[keep_cols]
 
     merged = df.merge(stacked, on=[ticker_col, date_col], how="left")
+    print("hello6")
+    print(merged)
     return merged
 
 
 def calculate_daily_returns(data):
-    return data.assign(daily_return=lambda df: df["close"] / df["open"] - 1)
+    return data.assign(daily_return=lambda df: df["close_price"] / df["open_price"] - 1)
+
+def save_df_to_csv(df, filename):
+    df.to_csv(filename, index=False)
 
 if __name__ == "__main__":
-    stocks_df = pd.read_csv('stocks.csv', encoding='utf-8')
+    stocks_df = pd.read_csv('C:/Users/rosie/dtsc-691/data/stocks.csv', encoding='utf-8')
     print_most_common_occurance(stocks_df)
     print("test1")
     stocks_df = drop_rows_with_less_than_n_occurences(stocks_df, 1000)
@@ -114,3 +150,5 @@ if __name__ == "__main__":
     print("test7")
 
     print(stocks_df)
+
+    save_df_to_csv(stocks_df, 'C:/Users/rosie/dtsc-691/data/stocks_processed.csv')
