@@ -7,7 +7,8 @@ import torch
 import torch.nn as nn
 
 from torch.utils.data import Dataset, DataLoader
-from transformers import AutoTokenizer, AutoModel, AdamW
+from transformers import AutoTokenizer, AutoModel
+from torch.optim import AdamW
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -34,7 +35,7 @@ if device.type == "cuda":
 # - "target_return"  (float, what we want to predict)
 
 TEXT_COL   = "headline"
-TARGET_COL = "target_return"
+TARGET_COL = "daily_return"
 NUM_COLS   = ["open_price", "close_price"]
 TICKER_COL = "stock"  # not used yet, but kept
 
