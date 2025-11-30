@@ -63,4 +63,6 @@ def render_home_page_and_results():
 
 if __name__ == "__main__":
     # Start the application
-    application.run(host="localhost", port=5000)
+    # LOCAL:
+    # application.run(host="localhost", port=5000)
+    application.run(debug=True)
