@@ -14,7 +14,7 @@
 <div class="content-wrapper">
   <h1> Price Chart </h1>
     <div class="plot-container">
-        <img src="{{ plot_url }}" alt="Price chart for {{ selected_ticker }}">
+        <img src="{{ plot_url_30_days }}" alt="Price chart for {{ selected_ticker }}">
     </div>
     <div>
      {% if articles %}
@@ -36,6 +36,19 @@
         {% else %}
             <p>No recent news found.</p>
         {% endif %}
+
+        <h1>Predicted Market Reaction</h1>
+
+    <h2>Summary stats (based on top 100 headlines)</h2>
+    <ul>
+        <li>Average predicted return: {{ avg_return | round(4) }}</li>
+        <li>5th percentile: {{ q05 | round(4) }}</li>
+        <li>Median (50th percentile): {{ q50 | round(4) }}</li>
+        <li>95th percentile: {{ q95 | round(4) }}</li>
+    </ul>
+
+    <h2>Distribution of predicted returns</h2>
+    <img src="{{ plot_url }}" alt="Predicted returns distribution" />
     </div>
 {#    <h1>Select a ticker</h1>#}
 {#    <form method="POST">#}
