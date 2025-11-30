@@ -5,7 +5,7 @@ import feedparser
 import requests
 
 
-def fetch_recent_news_for_ticker(ticker: str, days: int = 5, max_items: int = 50):
+def fetch_recent_news_for_ticker(ticker: str, days: int = 3, max_items: int = 50):
     """
     Fetch recent news articles for a stock ticker from Google News RSS.
 
