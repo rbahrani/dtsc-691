@@ -9,12 +9,12 @@ import pickle
 from datetime import datetime
 from scrapper import fetch_recent_news_for_ticker
 
-application = Flask(__name__)
+app = Flask(__name__)
 
 def predict(ticker):
     pass
 
-@application.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET', 'POST'])
 def render_home_page_and_results():
     list_of_tickers = ['AAPL', 'GOOG', 'TSLA', 'AMZN', 'META']
     selected_ticker = request.form.get('selected_ticker')
@@ -45,15 +45,15 @@ def render_home_page_and_results():
         return render_template("results.html", selected_ticker=selected_ticker, html_table=html_table, plot_url=plot_url, articles=articles)
     return render_template("homepage.html", list_of_tickers=list_of_tickers)
 
-# @application.route('/resume', methods=['GET'])
+# @app.route('/resume', methods=['GET'])
 # def render_resume():
 #     return render_template("resume.html")
 #
-# @application.route('/other_projects', methods=['GET'])
+# @app.route('/other_projects', methods=['GET'])
 # def render_other_projects():
 #     return render_template("other_projects.html")
 
-# @application.route('/DTSC_691_project', methods=['GET', 'POST'])
+# @app.route('/DTSC_691_project', methods=['GET', 'POST'])
 # def render_DTSC_691_project():
 #     list_of_tickers = ['General_SP500', 'AAPL', 'GOOG', 'TSLA', 'AMZN', 'META']
 #     selected_ticker = request.form.get('ticker')
@@ -62,7 +62,7 @@ def render_home_page_and_results():
 
 
 if __name__ == "__main__":
-    # Start the application
+    # Start the app
     # LOCAL:
-    # application.run(host="localhost", port=5000)
-    application.run(debug=True)
+    # app.run(host="localhost", port=5000)
+    app.run(debug=True)
