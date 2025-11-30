@@ -1,0 +1,10 @@
+Flask
+gunicorn
+pandas
+numpy
+scikit-learn
+yfinance
+transformers
+torch
+requests
+beautifulsoup4
