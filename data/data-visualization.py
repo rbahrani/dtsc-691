@@ -2,61 +2,69 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib.ticker import MultipleLocator
 
 df = pd.read_csv("stocks_processed_final.csv")
 df_original = pd.read_csv("stocks.csv")
 
 def show_daily_returns(df):
-    plt.figure(figsize=(8, 5))
-    plt.hist(df["daily_return"].dropna(), bins=50, edgecolor="black", alpha=0.7)
-    plt.title("Distribution of Daily Returns")
-    plt.xlabel("Daily Return")
-    plt.ylabel("Frequency")
-    plt.grid(alpha=0.3)
-    plt.tight_layout()
+
+    # Filter out the outliers
+    non_outliers = df[(df["daily_return"] <= 0.5)]
+    non_outliers = non_outliers[(non_outliers["daily_return"] >= -0.5)]
+    returns = non_outliers["daily_return"] * 100
+
+    # Create the plot
+    plt.figure(figsize=(12, 5))
+    plt.title("Occurrences of Different Daily Returns")
+    plt.xlabel("Stock Daily Return %")
+    plt.ylabel("Occurrences")
+    plt.hist(returns, bins=100)
+    plt.grid(alpha=0.5)
+
     plt.show()
+    plt.savefig("show_daily_returns.png")
 
 def show_headline_per_stock(df):
-    # Count samples per ticker
-    ticker_counts = df["date"].value_counts()
 
-    # Optionally show only top N (e.g., top 20)
-    TOP_N = 20
-    top_ticker_counts = ticker_counts.head(TOP_N)
+    # Count occurrences per ticker
+    ticker_counts = df["stock"].value_counts()
+    top_10 = ticker_counts.iloc[:10]
 
-    plt.figure(figsize=(10, 6))
-    top_ticker_counts.plot(kind="bar")
-    plt.title(f"Number of Headlines per Stock (Top {TOP_N})")
+    # Create the plot
+    top_10.plot(kind="bar")
+    plt.ylabel("Count of Headlines")
+    plt.title("Dataset # of News Headlines for Each Stock")
     plt.xlabel("Stock")
-    plt.ylabel("Number of Headlines")
-    plt.xticks(rotation=45, ha="right")
-    plt.grid(axis="y", alpha=0.3)
-    plt.tight_layout()
-    plt.show()
+    plt.figure(figsize=(12, 7))
+    plt.grid(alpha=0.5, axis="y")
 
-    print("Total unique tickers:", df["date"].nunique())
-    print(ticker_counts.describe())
+    plt.show()
+    plt.savefig("show_headline_per_stock.png")
 
 
 def show_headline_volume_over_time(df):
-    headline_per_day = df.groupby("date").size()
+    count_per_date = df.groupby("date").size()
 
     plt.figure(figsize=(10, 5))
-    headline_per_day.plot()
-    plt.title("Number of Headlines per Day")
+    count_per_date.plot(kind="line")
+    plt.title("Dataset's # of Headlines per Day")
     plt.xlabel("Date")
     plt.ylabel("Number of Headlines")
     plt.grid(alpha=0.3)
-    plt.tight_layout()
     plt.show()
+    plt.savefig("show_headline_volume_over_time.png")
 
 def show_distribution_of_headline_length(df):
-    headline_lengths = df["headline"].str.len()
-    plt.figure(figsize=(10, 5))
-    sns.histplot(headline_lengths, bins=50, kde=True)
-    plt.title("Distribution of Headline Lengths")
-    plt.xlabel("Headline Length")
-    plt.ylabel("Frequency")
+    str_lengths = df["headline"].str.len()
+    plt.figure(figsize=(10, 7))
+    sns.histplot(str_lengths, bins=100)
+    plt.title("Distribution of Lengths of Headline Strings")
+    plt.xlabel("Length of Headline Strings")
+    plt.ylabel("Occurrences")
+
+    plt.show()
+    plt.savefig("show_distribution_of_headline_length.png")
 
 
 if __name__ == "__main__":
