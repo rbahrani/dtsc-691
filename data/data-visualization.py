@@ -32,14 +32,14 @@ def show_headline_per_stock(df):
     top_10 = ticker_counts.iloc[:10]
 
     # Create the plot
+    plt.figure(figsize=(12, 7))
     top_10.plot(kind="bar")
     plt.ylabel("Count of Headlines")
     plt.title("Dataset # of News Headlines for Each Stock")
     plt.xlabel("Stock")
-    plt.figure(figsize=(12, 7))
     plt.grid(alpha=0.5, axis="y")
 
-    plt.show()
+    # plt.show()
     plt.savefig("show_headline_per_stock.png")
 
 
@@ -52,7 +52,7 @@ def show_headline_volume_over_time(df):
     plt.xlabel("Date")
     plt.ylabel("Number of Headlines")
     plt.grid(alpha=0.3)
-    plt.show()
+    # plt.show()
     plt.savefig("show_headline_volume_over_time.png")
 
 def show_distribution_of_headline_length(df):
@@ -63,12 +63,12 @@ def show_distribution_of_headline_length(df):
     plt.xlabel("Length of Headline Strings")
     plt.ylabel("Occurrences")
 
-    plt.show()
+    # plt.show()
     plt.savefig("show_distribution_of_headline_length.png")
 
 
 if __name__ == "__main__":
-    show_daily_returns(df)
-    show_headline_per_stock(df)
-    show_headline_volume_over_time(df)
+    # show_daily_returns(df)
+    # show_headline_per_stock(df)
+    # show_headline_volume_over_time(df)
     show_distribution_of_headline_length(df_original)
