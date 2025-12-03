@@ -1,28 +1,24 @@
-<!DOCTYPE html>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<nav>
+  <div class="nav-bg"></div>
+  <ul>
+    <li><a href="\">Home Page</a></li>
+    <li><a href="\resume">Resume</a></li>
+    <li><a href="\other_projects">Portfolio</a></li>
+    <li><a href="\DTSC_691_project">Project</a></li>
+  </ul>
+</nav>
 
-<html>
-<head>
-    <title>DTSC-691 Project</title>
-</head>
-<body>
-Welcome to the DTSC-691 project for this semester.
-</body>
-<body>
-    <h1>Select a ticker</h1>
-    <form method="POST">
-        <label for="selected_ticker">Choose a ticker:</label>
-        <select name="selected_ticker" id="selected_ticker">
-            {% for ticker in list_of_tickers %}
-                <option value="{{ ticker }}" {% if ticker == selected_ticker %}selected{% endif %}>{{ ticker }}</option>
-            {% endfor %}
-        </select>
-        <br><br>
-        <input type="submit" value="Submit">
-    </form>
-
-    {% if selected_ticker %}
-        <p>You selected: {{ selected_ticker }}</p>
-    {% endif %}
-</body>
-</html>
+<div class="resume-page">
+    <div class="intro-wrapper">
+        <div class="intro-text">
+            Welcome to my web application. My name is Rosie Bahrani and I am a software engineer by day and a DTSC student by night.
+            I graduated from the University of Waterloo with a degree in Software Engineering in 2022. I started working as a software engineer
+            for a financial firm after graduation. The inspiration behind this project comes from the time that I spent working on financial models
+            that included analyses on the prices of futures and options contracts.
+        </div>
+        <div class="content-wrapper">
+            <img src="../static/images/profile.PNG">
+        </div>
+    </div>
+</div>
