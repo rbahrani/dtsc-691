@@ -87,6 +87,40 @@ h1 {
   overflow: hidden;
 }
 
+/* Wrapper for the whole section */
+.intro-wrapper {
+    display: flex;
+    align-items: center;          /* vertically centers image + text */
+    justify-content: space-between;
+    gap: 40px;
+    padding: 40px 60px;
+    max-width: 1200px;
+    margin: auto;                 /* centers the layout */
+}
+
+/* Make text readable on dark background */
+.intro-text {
+    flex: 2;
+    font-size: 18px;
+    line-height: 1.6;
+    color: white;
+}
+
+/* Image container */
+.profile-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Style & size the profile image */
+.profile-img {
+    width: 50px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgb(224, 201, 201);
+}
+
 .content-wrapper form {
     position: relative;
     display: block;
