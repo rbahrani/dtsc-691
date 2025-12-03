@@ -117,7 +117,7 @@ def make_distribution_plot(preds):
     fig, ax = plt.subplots()
 
     # Histogram (approx bell curve)
-    ax.hist(preds, bins=20, density=True, alpha=0.7)
+    ax.hist(preds, bins=100, density=True, alpha=0.7)
     ax.set_xlabel("Predicted return")
     ax.set_ylabel("Density")
     ax.set_title("Distribution of Predicted Returns")
@@ -131,9 +131,6 @@ def make_distribution_plot(preds):
 
     # This is ready to embed in an <img src="..."> tag
     return f"data:image/png;base64,{image_base64}"
-
-
-
 
 @app.route('/', methods=['GET', 'POST'])
 def render_home_page_and_results():
@@ -172,10 +169,10 @@ def render_home_page_and_results():
         return render_template("results.html", selected_ticker=selected_ticker, html_table=html_table, plot_url_30_days=plot_url_30_days, plot_url=plot_url, articles=articles, predictions=predictions, avg_return=stats["avg"], q05=stats["q05"], q50=stats["q50"], q95=stats["q95"])
     return render_template("homepage.html", list_of_tickers=list_of_tickers)
 
-# @app.route('/resume', methods=['GET'])
-# def render_resume():
-#     return render_template("resume.html")
-#
+@app.route('/resume', methods=['GET'])
+def render_resume():
+    return render_template("resume.html")
+
 # @app.route('/other_projects', methods=['GET'])
 # def render_other_projects():
 #     return render_template("other_projects.html")
@@ -191,5 +188,5 @@ def render_home_page_and_results():
 if __name__ == "__main__":
     # Start the app
     # LOCAL:
-    # app.run(host="localhost", port=5000)
-    app.run(debug=True)
+    app.run(host="localhost", port=5000)
+    # app.run(debug=True)
