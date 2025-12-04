@@ -136,13 +136,6 @@ h1 {
     font-size: 24px;
 }
 
-.bio-intro-text {
-    display: block;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 40px;
-}
-
 .content-wrapper form {
     position: fixed;
     display: block;
