@@ -11,34 +11,26 @@
 <div class="results-for-query">
   <h1>Here are the results of your query for {{ selected_ticker }}:</h1>
 </div>
-<div class="content-wrapper">
-  <h1> Price Chart </h1>
+<div class="results-content-wrapper">
     <div class="plot-container">
         <img src="{{ plot_url_30_days }}" alt="Price chart for {{ selected_ticker }}">
     </div>
     <div>
-     {% if articles %}
+        <h2>Relevant News</h2>
             {% for a in articles %}
                 <div class="article">
                     <a href="{{ a.link }}" target="_blank">
                         {{ a.title }}
                     </a>
-
                     {% if a.source %}
-                        <div><small>Source: {{ a.source }}</small></div>
+                        <div><small>New source: {{ a.source }}</small></div>
                     {% endif %}
-
                     {% if a.published %}
-                        <div><small>Published: {{ a.published }}</small></div>
+                        <div><small>Date: {{ a.published }}</small></div>
                     {% endif %}
                 </div>
             {% endfor %}
-        {% else %}
-            <p>No recent news found.</p>
-        {% endif %}
-
-        <h1>Predicted Market Reaction</h1>
-
+    <h1>Predicted Market Reaction</h1>
     <h2>Summary stats (based on top 100 headlines)</h2>
     <ul>
         <li>Average predicted return: {{ avg_return | round(4) }}</li>

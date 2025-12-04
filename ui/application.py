@@ -114,9 +114,9 @@ import matplotlib.pyplot as plt
 import io, base64
 
 def make_distribution_plot(preds):
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(12, 6))
 
-    ax.hist(preds, bins=200, alpha=0.7)
+    ax.hist(preds, bins=300, alpha=0.7)
     ax.set_xlabel("Predicted returns")
     ax.set_ylabel("Density")
     ax.set_title("Distribution of Predicted Returns")
@@ -128,7 +128,6 @@ def make_distribution_plot(preds):
     image_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
     plt.close(fig)
 
-    # This is ready to embed in an <img src="..."> tag
     return f"data:image/png;base64,{image_base64}"
 
 @app.route('/', methods=['GET', 'POST'])
@@ -141,7 +140,7 @@ def render_home_page_and_results():
 
         # PLT code
         plt.style.use('dark_background')
-        fig, ax = plt.subplots(figsize=(20, 10))
+        fig, ax = plt.subplots(figsize=(15, 10))
         ax.plot(data.index, close_prices, linewidth=3)
         ax.set_title(f'{selected_ticker} – Last 30 Days (Close Prices)', fontsize=12)
         ax.set_xlabel('Date', fontsize=8)
