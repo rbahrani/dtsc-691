@@ -116,9 +116,8 @@ import io, base64
 def make_distribution_plot(preds):
     fig, ax = plt.subplots()
 
-    # Histogram (approx bell curve)
-    ax.hist(preds, bins=100, density=True, alpha=0.7)
-    ax.set_xlabel("Predicted return")
+    ax.hist(preds, bins=200, alpha=0.7)
+    ax.set_xlabel("Predicted returns")
     ax.set_ylabel("Density")
     ax.set_title("Distribution of Predicted Returns")
 
@@ -167,22 +166,18 @@ def render_home_page_and_results():
         stats = compute_stats(predictions)
         plot_url = make_distribution_plot(predictions)
         return render_template("results.html", selected_ticker=selected_ticker, html_table=html_table, plot_url_30_days=plot_url_30_days, plot_url=plot_url, articles=articles, predictions=predictions, avg_return=stats["avg"], q05=stats["q05"], q50=stats["q50"], q95=stats["q95"])
-    return render_template("homepage.html", list_of_tickers=list_of_tickers)
+    return render_template("dtsc-691.html", list_of_tickers=list_of_tickers)
 
 @app.route('/resume', methods=['GET'])
 def render_resume():
     return render_template("resume.html")
 
-# @app.route('/other_projects', methods=['GET'])
-# def render_other_projects():
-#     return render_template("other_projects.html")
-
-# @app.route('/DTSC_691_project', methods=['GET', 'POST'])
-# def render_DTSC_691_project():
-#     list_of_tickers = ['General_SP500', 'AAPL', 'GOOG', 'TSLA', 'AMZN', 'META']
-#     selected_ticker = request.form.get('ticker')
-#
-#     return render_template("index.html", list_of_tickers=list_of_tickers, selected_ticker=selected_ticker)
+@app.route('/biographical_homepage', methods=['GET'])
+def render_biographical_homepage():
+    return render_template("biographical_homepage.html")
+@app.route('/other_projects', methods=['GET'])
+def render_other_projects():
+    return render_template("other_projects.html")
 
 
 if __name__ == "__main__":
