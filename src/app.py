@@ -167,10 +167,12 @@ def render_home_page_and_results():
 
         html_table = data.to_html(classes='stock-table', border=1, justify='left')
         print("before fetch recent news for ticker")
-        articles = fetch_recent_news_for_ticker(selected_ticker)
+        #articles = fetch_recent_news_for_ticker(selected_ticker)
         print("after fetch recent news for ticker")
-        headlines = [a["title"] for a in articles]  # extract just the text
+        #headlines = [a["title"] for a in articles]  # extract just the text
         print("before predict returns for headlines")
+        articles = []
+        headlines = ["TESLA bought a company", "TESLA is selling its majority shares"]
         predictions = predict_returns_for_headlines(headlines)
         print("after predict returns for headlines")
         # print("PREDICTIONS ARE:")
