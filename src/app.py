@@ -166,7 +166,7 @@ def render_home_page_and_results():
         plot_url_30_days = f"data:image/png;base64,{img_base64}"
 
         html_table = data.to_html(classes='stock-table', border=1, justify='left')
-        print("before fetch recent news for ticker")
+        print("before fetch recent news for ticker", flush=True)
         #articles = fetch_recent_news_for_ticker(selected_ticker)
         print("after fetch recent news for ticker")
         #headlines = [a["title"] for a in articles]  # extract just the text
