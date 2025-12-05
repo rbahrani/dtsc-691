@@ -69,7 +69,15 @@ tokenizer = AutoTokenizer.from_pretrained("ProsusAI/finbert")
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 model = FinBERTRegressor()
-state_dict = torch.load("finbert_regressor_best.pt", map_location=DEVICE)
+
+from huggingface_hub import hf_hub_download
+
+model_path = hf_hub_download(
+    repo_id="rosiebahrani/finbert_regressor_best.pt",     # <-- your actual repo
+    filename="finbert_regressor_best.pt",         # <-- exact filename
+)
+
+state_dict = torch.load(model_path, map_location=DEVICE)
 model.load_state_dict(state_dict)
 model.to(DEVICE)
 model.eval()
