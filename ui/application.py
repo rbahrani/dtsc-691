@@ -73,8 +73,9 @@ model = FinBERTRegressor()
 from huggingface_hub import hf_hub_download
 
 model_path = hf_hub_download(
-    repo_id="rosiebahrani/finbert_regressor_best.pt",     # <-- your actual repo
-    filename="finbert_regressor_best.pt",         # <-- exact filename
+    repo_id="rosiebahrani/finbert_regressor_best.pt",
+    filename="finbert_regressor_best.pt",
+    repo_type="model",
 )
 
 state_dict = torch.load(model_path, map_location=DEVICE)
