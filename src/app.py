@@ -168,20 +168,20 @@ def render_home_page_and_results():
         html_table = data.to_html(classes='stock-table', border=1, justify='left')
         print("before fetch recent news for ticker", flush=True)
         #articles = fetch_recent_news_for_ticker(selected_ticker)
-        print("after fetch recent news for ticker")
+        print("after fetch recent news for ticker", flush=True)
         #headlines = [a["title"] for a in articles]  # extract just the text
-        print("before predict returns for headlines")
+        print("before predict returns for headlines", flush=True)
         articles = []
         headlines = ["TESLA bought a company", "TESLA is selling its majority shares"]
         predictions = predict_returns_for_headlines(headlines)
-        print("after predict returns for headlines")
+        print("after predict returns for headlines", flush=True)
         # print("PREDICTIONS ARE:")
         # print(predictions)
-        print("before computing stats")
+        print("before computing stats", flush=True)
         stats = compute_stats(predictions)
-        print("after computing stats")
+        print("after computing stats", flush=True)
         plot_url = make_distribution_plot(predictions)
-        print("after making plot")
+        print("after making plot", flush=True)
         return render_template("results.html", selected_ticker=selected_ticker, html_table=html_table, plot_url_30_days=plot_url_30_days, plot_url=plot_url, articles=articles, predictions=predictions, avg_return=stats["avg"], q05=stats["q05"], q50=stats["q50"], q95=stats["q95"])
     return render_template("dtsc-691.html", list_of_tickers=list_of_tickers)
 
