@@ -67,8 +67,67 @@ def show_distribution_of_headline_length(df):
     plt.savefig("show_distribution_of_headline_length.png")
 
 
+def get_statistical_analysis_on_raw_data(df):
+
+    # Analysis of the news headlines
+
+    df['headline_length'] = df['headline'].str.len()
+    print(df['headline_length'].describe())
+
+    # Median, Min and Max headline lengths
+    print("Max headline length is: ", df['headline_length'].median())
+    print("Max headline length is: ", df['headline_length'].max())
+    print("Min headline length is: ", df['headline_length'].min())
+
+
+def get_statistical_analysis_on_processed_data(df):
+    print(df.describe())
+    print(df.info())
+    print(df.isnull().sum())
+
+    daily_returns = df["daily_return"]
+    print(daily_returns.describe())
+    print(daily_returns.info())
+
+    # Analyzing the min and max daily returns
+    print("Max daily return is: ", daily_returns.max())
+    print("Min daily return is: ", daily_returns.min())
+
+    # Analysing the median
+    print("Median daily return is: ", daily_returns.median())
+
+    # Analysing the open prices of the stocks
+    open_prices = df["open_price"]
+    print(open_prices.describe())
+    print(open_prices.info())
+
+    # Analysing min, max, and median of the open prices
+    print("Max open price is: ", open_prices.max())
+    print("Min open price is: ", open_prices.min())
+    print("Median open price is: ", open_prices.median())
+
+    # Analysing the close prices of the stocks
+    close_prices = df["close_price"]
+    print(close_prices.describe())
+    print(close_prices.info())
+
+    # Analysing min, max, and median of the close prices
+    print("Max open price is: ", close_prices.max())
+    print("Min open price is: ", close_prices.min())
+    print("Median open price is: ", close_prices.median())
+
+    # Analysis on the count of news headlines per stock
+    stock_counts = df["stock"].value_counts()
+    print("Top 10 stocks with most news headline counts:")
+    print(stock_counts.head(10))
+    print("Bottom 10 stocks with fewest news headline counts:")
+    print(stock_counts.tail(10))
+
+
 if __name__ == "__main__":
     # show_daily_returns(df)
     # show_headline_per_stock(df)
     # show_headline_volume_over_time(df)
-    show_distribution_of_headline_length(df_original)
+    # show_distribution_of_headline_length(df_original)
+    get_statistical_analysis_on_raw_data(df_original)
+    # get_statistical_analysis_on_processed_data(df)
