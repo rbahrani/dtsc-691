@@ -11,7 +11,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from transformers import AutoTokenizer, AutoModel
-from ui.scrapper import fetch_recent_news_for_ticker
+from .scrapper import fetch_recent_news_for_ticker
 
 
 class FinBERTRegressor(nn.Module):
