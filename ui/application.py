@@ -166,13 +166,20 @@ def render_home_page_and_results():
         plot_url_30_days = f"data:image/png;base64,{img_base64}"
 
         html_table = data.to_html(classes='stock-table', border=1, justify='left')
+        print("before fetch recent news for ticker")
         articles = fetch_recent_news_for_ticker(selected_ticker)
+        print("after fetch recent news for ticker")
         headlines = [a["title"] for a in articles]  # extract just the text
+        print("before predict returns for headlines")
         predictions = predict_returns_for_headlines(headlines)
+        print("after predict returns for headlines")
         # print("PREDICTIONS ARE:")
         # print(predictions)
+        print("before computing stats")
         stats = compute_stats(predictions)
+        print("after computing stats")
         plot_url = make_distribution_plot(predictions)
+        print("after making plot")
         return render_template("results.html", selected_ticker=selected_ticker, html_table=html_table, plot_url_30_days=plot_url_30_days, plot_url=plot_url, articles=articles, predictions=predictions, avg_return=stats["avg"], q05=stats["q05"], q50=stats["q50"], q95=stats["q95"])
     return render_template("dtsc-691.html", list_of_tickers=list_of_tickers)
 
