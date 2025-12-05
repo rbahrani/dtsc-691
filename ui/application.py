@@ -69,10 +69,10 @@ tokenizer = AutoTokenizer.from_pretrained("ProsusAI/finbert")
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 model = FinBERTRegressor()
-#state_dict = torch.load("finbert_regressor_best.pt", map_location=DEVICE)
-#model.load_state_dict(state_dict)
-#model.to(DEVICE)
-#model.eval()
+state_dict = torch.load("finbert_regressor_best.pt", map_location=DEVICE)
+model.load_state_dict(state_dict)
+model.to(DEVICE)
+model.eval()
 
 def predict_returns_for_headlines(headlines, max_length=64):
     """
@@ -159,13 +159,12 @@ def render_home_page_and_results():
         html_table = data.to_html(classes='stock-table', border=1, justify='left')
         articles = fetch_recent_news_for_ticker(selected_ticker)
         headlines = [a["title"] for a in articles]  # extract just the text
-        #predictions = predict_returns_for_headlines(headlines)
+        predictions = predict_returns_for_headlines(headlines)
         # print("PREDICTIONS ARE:")
         # print(predictions)
-        #stats = compute_stats(predictions)
-        #plot_url = make_distribution_plot(predictions)
-        return render_template("dtsc-691.html", list_of_tickers=list_of_tickers)
-        #return render_template("results.html", selected_ticker=selected_ticker, html_table=html_table, plot_url_30_days=plot_url_30_days, plot_url=plot_url, articles=articles, predictions=predictions, avg_return=stats["avg"], q05=stats["q05"], q50=stats["q50"], q95=stats["q95"])
+        stats = compute_stats(predictions)
+        plot_url = make_distribution_plot(predictions)
+        return render_template("results.html", selected_ticker=selected_ticker, html_table=html_table, plot_url_30_days=plot_url_30_days, plot_url=plot_url, articles=articles, predictions=predictions, avg_return=stats["avg"], q05=stats["q05"], q50=stats["q50"], q95=stats["q95"])
     return render_template("dtsc-691.html", list_of_tickers=list_of_tickers)
 
 @app.route('/resume', methods=['GET'])
