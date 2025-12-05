@@ -44,13 +44,13 @@ def show_headline_per_stock(df):
 
 
 def show_headline_volume_over_time(df):
-    count_per_date = df.groupby("date").size()
+    count_of_headlines_per_date = df.groupby("date").size()
 
     plt.figure(figsize=(10, 5))
-    count_per_date.plot(kind="line")
+    count_of_headlines_per_date.plot(kind="line")
     plt.title("Dataset's # of Headlines per Day")
     plt.xlabel("Date")
-    plt.ylabel("Number of Headlines")
+    plt.ylabel("Count of Headlines")
     plt.grid(alpha=0.3)
     # plt.show()
     plt.savefig("show_headline_volume_over_time.png")
@@ -81,10 +81,6 @@ def get_statistical_analysis_on_raw_data(df):
 
 
 def get_statistical_analysis_on_processed_data(df):
-    print(df.describe())
-    print(df.info())
-    print(df.isnull().sum())
-
     daily_returns = df["daily_return"]
     print(daily_returns.describe())
     print(daily_returns.info())
@@ -112,22 +108,15 @@ def get_statistical_analysis_on_processed_data(df):
     print(close_prices.info())
 
     # Analysing min, max, and median of the close prices
-    print("Max open price is: ", close_prices.max())
-    print("Min open price is: ", close_prices.min())
-    print("Median open price is: ", close_prices.median())
-
-    # Analysis on the count of news headlines per stock
-    stock_counts = df["stock"].value_counts()
-    print("Top 10 stocks with most news headline counts:")
-    print(stock_counts.head(10))
-    print("Bottom 10 stocks with fewest news headline counts:")
-    print(stock_counts.tail(10))
+    print("Max close price is: ", close_prices.max())
+    print("Min close price is: ", close_prices.min())
+    print("Median close price is: ", close_prices.median())
 
 
 if __name__ == "__main__":
-    # show_daily_returns(df)
-    # show_headline_per_stock(df)
-    # show_headline_volume_over_time(df)
-    # show_distribution_of_headline_length(df_original)
+    show_daily_returns(df)
+    show_headline_per_stock(df)
+    show_headline_volume_over_time(df)
+    show_distribution_of_headline_length(df_original)
     get_statistical_analysis_on_raw_data(df_original)
-    # get_statistical_analysis_on_processed_data(df)
+    get_statistical_analysis_on_processed_data(df)
