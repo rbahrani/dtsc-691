@@ -79,7 +79,6 @@ class CustomDataset(Dataset):
 
         item = {}
         for k, v in tokenized_headline.items():
-            print("Current encoding key is: ", k)
             item[k] = v.squeeze(0)
         item["labels"] = torch.tensor(target, dtype=torch.float32)
 
@@ -145,13 +144,16 @@ def train_epoch(model, dataloader, optimizer, device):
     model.train()
     total_loss = 0.0
 
+    i = 0
     for batch in dataloader:
-
+        if i % 1000 == 0:
+            print(f"Training batch {i}/{len(dataloader)}")
+        i += 1
         # move all the batch data to GPU / CPU
         input_ids = batch["input_ids"].to(device)
         attention_mask = batch["attention_mask"].to(device)
         token_type_ids = batch.get("token_type_ids")
-        if token_type_ids:
+        if token_type_ids is not None:
             token_type_ids = token_type_ids.to(device)
 
         labels = batch["labels"].to(device)
