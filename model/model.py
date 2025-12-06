@@ -1,171 +1,147 @@
-# ============================
-# 1. Install & imports
-# ============================
+from sklearn.metrics import mean_absolute_error
+from sklearn.model_selection import train_test_split
+
+from torch.optim import AdamW
+import torch.nn as nn
+from torch.utils.data import DataLoader, Dataset
+
 import numpy as np
 import pandas as pd
 import torch
-import torch.nn as nn
-
-from torch.utils.data import Dataset, DataLoader
 from transformers import AutoTokenizer, AutoModel
-from torch.optim import AdamW
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
-# Set device
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print("Device:", device)
+# set the device used for training
+if torch.cuda.is_available():
+    device = torch.device("cuda")
+else:
+    device = torch.device("cpu")
 
-# Optional: set random seeds for reproducibility
-SEED = 42
-np.random.seed(SEED)
-torch.manual_seed(SEED)
-if device.type == "cuda":
-    torch.cuda.manual_seed_all(SEED)
+print("Current device:", device)
 
-# ============================
-# 2. Data prep & 80/10/10 split
-# ============================
-# Assumed df columns:
-# - "headline"           (text)
-# - "stock"          (ticker string)
-# - "open_price"     (float)
-# - "close_price"    (float)
-# - "target_return"  (float, what we want to predict)
-
-TEXT_COL   = "headline"
-TARGET_COL = "daily_return"
-NUM_COLS   = ["open_price", "close_price"]
-TICKER_COL = "stock"  # not used yet, but kept
-
+# import the training data as a dataframe
 df = pd.read_csv("C:/Users/rosie/dtsc-691/data/stocks_processed.csv", encoding="utf-8")
 
-# Drop rows with missing values in key columns
-df = df.dropna(subset=[TEXT_COL, TARGET_COL] + NUM_COLS).copy()
+# setting random seed, so that results are reproducible
+seed = 25
+np.random.seed(seed)
+torch.manual_seed(seed)
+if device.type == "cuda":
+    torch.cuda.manual_seed_all(seed)
 
-# Shuffle
-df = df.sample(frac=1.0, random_state=SEED).reset_index(drop=True)
+# defining the input and output for the training of the model
+input_col   = "headline"
+target = "daily_return"
 
-# 80% train, 10% val, 10% test
-train_df, temp_df = train_test_split(df, test_size=0.2, random_state=SEED)
-val_df, test_df   = train_test_split(temp_df, test_size=0.5, random_state=SEED)
+# shuffling the data will reduce potential for bias.
+df = df.sample(frac=1.0, random_state=seed).reset_index(drop=True)
 
-print("Train size:", len(train_df))
-print("Val size  :", len(val_df))
-print("Test size :", len(test_df))
+# 80% training data, 10% validation data, 10% test data
+train_df, validation_and_test = train_test_split(df, test_size=0.2, random_state=seed)
+val_df, test_df = train_test_split(validation_and_test, test_size=0.5, random_state=seed)
 
-# ============================
-# 3. Scale numeric features (fit on train only)
-# ============================
-scaler = StandardScaler()
-train_df[NUM_COLS] = scaler.fit_transform(train_df[NUM_COLS])
-val_df[NUM_COLS]   = scaler.transform(val_df[NUM_COLS])
-test_df[NUM_COLS]  = scaler.transform(test_df[NUM_COLS])
+# print the sizes for sanity check
+print("Size of training data:", len(train_df))
+print("Size of validation data:", len(val_df))
+print("Size of test data:", len(test_df))
 
-# ============================
-# 4. Tokenizer & Dataset
-# ============================
-MODEL_NAME = "ProsusAI/finbert"  # or "yiyanghkust/finbert-tone"
-tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
+# getting the pre trained model
+pre_trained_model = "ProsusAI/finbert"
+tokenizer = AutoTokenizer.from_pretrained(pre_trained_model)
 
-class NewsDataset(Dataset):
-    def __init__(self, df, tokenizer, text_col, target_col, num_cols, max_len=128):
-        self.texts   = df[text_col].astype(str).tolist()
-        self.targets = df[target_col].astype(np.float32).values
-        self.num_feats = df[num_cols].astype(np.float32).values  # shape [N, num_features]
+
+# for pytorch to be able to use the data for training, we need to convert the data from
+# the dataframe into pytorch tensors. We can use a custom dataset class to achieve thie.
+class CustomDataset(Dataset):
+    def __init__(self, df, tokenizer, input_col, target, max_len=64):
+        self.headlines   = df[input_col].astype(str).tolist()
+        self.targets = df[target].astype(np.float32).values # pytorch models expect float32
         self.tokenizer = tokenizer
+
+        # max length of 64 for the news headlines. Headlines are on median of length 55 chars.
         self.max_len = max_len
 
     def __len__(self):
-        return len(self.texts)
+        return len(self.headlines)
 
     def __getitem__(self, idx):
-        text   = self.texts[idx]
+        headline   = self.headlines[idx]
         target = self.targets[idx]
-        num_f  = self.num_feats[idx]
 
-        enc = self.tokenizer(
-            text,
-            truncation=True,
+        tokenized_headline = self.tokenizer(
+            headline,
             padding="max_length",
             max_length=self.max_len,
-            return_tensors="pt"
+            return_tensors="pt",
+            truncation=True
         )
 
-        item = {k: v.squeeze(0) for k, v in enc.items()}
-        item["labels"]    = torch.tensor(target, dtype=torch.float32)
-        item["num_feats"] = torch.tensor(num_f, dtype=torch.float32)  # price features
+        # we expect the tokenizer to return a dictionary with keys "input_ids", "attention_mask", and "token_type_ids"
+
+        item = {}
+        for k, v in tokenized_headline.items():
+            print("Current encoding key is: ", k)
+            item[k] = v.squeeze(0)
+        item["labels"] = torch.tensor(target, dtype=torch.float32)
 
         return item
 
-# Create datasets
-train_dataset = NewsDataset(train_df, tokenizer, TEXT_COL, TARGET_COL, NUM_COLS)
-val_dataset   = NewsDataset(val_df,   tokenizer, TEXT_COL, TARGET_COL, NUM_COLS)
-test_dataset  = NewsDataset(test_df,  tokenizer, TEXT_COL, TARGET_COL, NUM_COLS)
+# create custom datasets and pass them to the PyTorch dataloader
+train_dataset = CustomDataset(train_df, tokenizer, input_col, target)
+val_dataset   = CustomDataset(val_df,   tokenizer, input_col, target)
+test_dataset  = CustomDataset(test_df,  tokenizer, input_col, target)
 
-# DataLoaders
-BATCH_SIZE = 16
+train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+val_loader   = DataLoader(val_dataset,   batch_size=64, shuffle=False)
+test_loader  = DataLoader(test_dataset,  batch_size=64, shuffle=False)
 
-train_loader = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
-val_loader   = DataLoader(val_dataset,   batch_size=BATCH_SIZE, shuffle=False)
-test_loader  = DataLoader(test_dataset,  batch_size=BATCH_SIZE, shuffle=False)
 
-# ============================
-# 5. Model: FinBERT frozen + numeric features + regression head
-# ============================
-class FinBertRegressor(nn.Module):
-    def __init__(self, base_model_name=MODEL_NAME, num_feature_dim=len(NUM_COLS), dropout=0.1):
+class FinBERT_Frozen_Regressor(nn.Module):
+    def __init__(self, base_model_name=pre_trained_model, dropout=0.1):
         super().__init__()
-        self.finbert = AutoModel.from_pretrained(base_model_name)
+        self.base_model = AutoModel.from_pretrained(base_model_name)
 
-        # Freeze FinBERT weights
-        for p in self.finbert.parameters():
-            p.requires_grad = False
+        # freeze all the parameters of the base model
+        for param in self.base_model.parameters():
+            param.requires_grad = False
 
-        hidden_size = self.finbert.config.hidden_size  # usually 768
-        total_in = hidden_size + num_feature_dim       # CLS + numeric features
-
-        self.reg_head = nn.Sequential(
+        # note: dropout is used to avoid overfitting
+        # in this regessor, we take the n-dimensional vector from FinBERT and convert it
+        # to a vector of size 128. Then, it is passed to a ReLU layer and finally, to a single
+        # output layer (aka, predicted daily return).
+        self.regressor = nn.Sequential(
             nn.Dropout(dropout),
-            nn.Linear(total_in, 128),
+            nn.Linear(self.base_model.config.hidden_size, 128),
             nn.ReLU(),
             nn.Linear(128, 1)
         )
 
-    def forward(self, input_ids, attention_mask, num_feats, token_type_ids=None, labels=None):
-        outputs = self.finbert(
+    def forward(self, input_ids, attention_mask, token_type_ids=None, labels=None):
+        outputs = self.base_model(
             input_ids=input_ids,
             attention_mask=attention_mask,
             token_type_ids=token_type_ids
         )
 
-        # CLS token embedding
-        cls_emb = outputs.last_hidden_state[:, 0, :]  # [batch_size, hidden_size]
+        # In BERT models, the first token is the CLS embedding which is designed to be
+        # the sentence-level representation.
+        cls = outputs.last_hidden_state[:, 0, :]
 
-        # Concatenate numeric features
-        x = torch.cat([cls_emb, num_feats], dim=-1)   # [batch_size, hidden_size + num_dim]
+        prediction = self.regressor(cls).squeeze(-1)
 
-        preds = self.reg_head(x).squeeze(-1)          # [batch_size]
-
+        # compute the regression loss
         loss = None
         if labels is not None:
-            loss = nn.MSELoss()(preds, labels)
+            loss = nn.MSELoss()(prediction, labels)
 
-        return preds, loss
+        return prediction, loss
 
-model = FinBertRegressor().to(device)
+model = FinBERT_Frozen_Regressor()
+model.to(device)
+
+print("The designed model is as follows: ")
 print(model)
 
-# ============================
-# 6. Train / eval utilities
-# ============================
-EPOCHS = 5
-LR = 2e-4
-
-optimizer = AdamW(model.parameters(), lr=LR)
-
-def train_one_epoch(model, dataloader, optimizer, device):
+def train_epoch(model, dataloader, optimizer, device):
     model.train()
     total_loss = 0.0
 
@@ -176,15 +152,13 @@ def train_one_epoch(model, dataloader, optimizer, device):
         if token_type_ids is not None:
             token_type_ids = token_type_ids.to(device)
 
-        labels    = batch["labels"].to(device)
-        num_feats = batch["num_feats"].to(device)
+        labels = batch["labels"].to(device)
 
         optimizer.zero_grad()
         preds, loss = model(
             input_ids=input_ids,
             attention_mask=attention_mask,
             token_type_ids=token_type_ids,
-            num_feats=num_feats,
             labels=labels
         )
         loss.backward()
@@ -233,38 +207,32 @@ def evaluate(model, dataloader, device):
 
     return mse, mae, all_preds, all_targets
 
-# ============================
-# 7. Training loop
-# ============================
-best_val_mae = float("inf")
+### TRAINING LOOP ###
 
-for epoch in range(1, EPOCHS + 1):
-    train_mse = train_one_epoch(model, train_loader, optimizer, device)
+# initialize with "infinity"
+best_val_mae = float("inf")
+# reasonable learning rate for BERT as we are not fine-tuning the model, but rather training the regressor
+optimizer = AdamW(model.parameters(), lr=2e-4)
+
+epoch_count = 5
+for i in range(1, epoch_count + 1):
+    train_mse = train_epoch(model, train_loader, optimizer, device)
     val_mse, val_mae, _, _ = evaluate(model, val_loader, device)
 
-    print(f"Epoch {epoch}/{EPOCHS}")
-    print(f"  Train MSE: {train_mse:.6f}")
-    print(f"  Val   MSE: {val_mse:.6f} | Val MAE: {val_mae:.6f}")
+    print(f"Epoch {i}/{epoch_count} done!")
+    print("Train MSE: ", train_mse, "Val MSE: ", val_mse, "Val MAE: ", val_mae)
 
-    # Simple "best model" tracking (by MAE)
+    # if mae is lower than best seen, save the model
     if val_mae < best_val_mae:
         best_val_mae = val_mae
         torch.save(model.state_dict(), "finbert_regressor_best.pt")
-        print("  --> Saved new best model")
+        print("Saved best model.")
 
-# ============================
-# 8. Final test evaluation
-# ============================
-# Load best model (optional but recommended)
+
+### TEST EVALUATION ###
+
 model.load_state_dict(torch.load("finbert_regressor_best.pt", map_location=device))
-
 test_mse, test_mae, test_preds, test_targets = evaluate(model, test_loader, device)
 
-test_rmse = np.sqrt(test_mse)
-test_r2   = r2_score(test_targets, test_preds)
-
-print("\n=== Test set metrics ===")
-print(f"MSE : {test_mse:.6f}")
-print(f"RMSE: {test_rmse:.6f}")
-print(f"MAE : {test_mae:.6f}")
-print(f"R^2 : {test_r2:.6f}")
+print("\n=== Test dataset metrics ===")
+print("MSE: ", test_mse, "RMSE: ", np.sqrt(test_mse), "MAE: ", test_mae)
