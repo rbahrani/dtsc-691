@@ -146,25 +146,29 @@ def train_epoch(model, dataloader, optimizer, device):
     total_loss = 0.0
 
     for batch in dataloader:
+
+        # move all the batch data to GPU / CPU
         input_ids = batch["input_ids"].to(device)
         attention_mask = batch["attention_mask"].to(device)
         token_type_ids = batch.get("token_type_ids")
-        if token_type_ids is not None:
+        if token_type_ids:
             token_type_ids = token_type_ids.to(device)
 
         labels = batch["labels"].to(device)
 
+
+        # at each iteration, clear out the gradients from the last batch
         optimizer.zero_grad()
-        preds, loss = model(
+        predictions, loss = model(
             input_ids=input_ids,
             attention_mask=attention_mask,
             token_type_ids=token_type_ids,
             labels=labels
         )
-        loss.backward()
-        optimizer.step()
+        loss.backward() # backpropagation to computer gradient
+        optimizer.step() # perform parameter update
 
-        total_loss += loss.item() * input_ids.size(0)
+        total_loss += loss.item() * input_ids.size(0) # multiply by the batch size since loss is averaged
 
     avg_loss = total_loss / len(dataloader.dataset)
     return avg_loss
@@ -173,10 +177,10 @@ def train_epoch(model, dataloader, optimizer, device):
 def evaluate(model, dataloader, device):
     model.eval()
     total_loss = 0.0
-    all_preds = []
-    all_targets = []
+    all_predictions = []
+    all_labels = []
 
-    with torch.no_grad():
+    with torch.no_grad(): # disable gradient calculation
         for batch in dataloader:
             input_ids = batch["input_ids"].to(device)
             attention_mask = batch["attention_mask"].to(device)
@@ -184,28 +188,26 @@ def evaluate(model, dataloader, device):
             if token_type_ids is not None:
                 token_type_ids = token_type_ids.to(device)
 
-            labels    = batch["labels"].to(device)
-            num_feats = batch["num_feats"].to(device)
+            labels = batch["labels"].to(device)
 
-            preds, loss = model(
+            prediction, loss = model(
                 input_ids=input_ids,
                 attention_mask=attention_mask,
                 token_type_ids=token_type_ids,
-                num_feats=num_feats,
                 labels=labels
             )
 
             total_loss += loss.item() * input_ids.size(0)
-            all_preds.append(preds.cpu().numpy())
-            all_targets.append(labels.cpu().numpy())
+            all_predictions.append(prediction.cpu().numpy())
+            all_labels.append(labels.cpu().numpy())
 
-    all_preds   = np.concatenate(all_preds)
-    all_targets = np.concatenate(all_targets)
+    all_predictions = np.concatenate(all_predictions)
+    all_labels = np.concatenate(all_labels)
 
     mse = total_loss / len(dataloader.dataset)
-    mae = mean_absolute_error(all_targets, all_preds)
+    mae = mean_absolute_error(all_labels, all_predictions)
 
-    return mse, mae, all_preds, all_targets
+    return mse, mae
 
 ### TRAINING LOOP ###
 
@@ -217,7 +219,7 @@ optimizer = AdamW(model.parameters(), lr=2e-4)
 epoch_count = 5
 for i in range(1, epoch_count + 1):
     train_mse = train_epoch(model, train_loader, optimizer, device)
-    val_mse, val_mae, _, _ = evaluate(model, val_loader, device)
+    val_mse, val_mae = evaluate(model, val_loader, device)
 
     print(f"Epoch {i}/{epoch_count} done!")
     print("Train MSE: ", train_mse, "Val MSE: ", val_mse, "Val MAE: ", val_mae)
@@ -232,7 +234,7 @@ for i in range(1, epoch_count + 1):
 ### TEST EVALUATION ###
 
 model.load_state_dict(torch.load("finbert_regressor_best.pt", map_location=device))
-test_mse, test_mae, test_preds, test_targets = evaluate(model, test_loader, device)
+test_mse, test_mae = evaluate(model, test_loader, device)
 
 print("\n=== Test dataset metrics ===")
 print("MSE: ", test_mse, "RMSE: ", np.sqrt(test_mse), "MAE: ", test_mae)
